@@ -14,13 +14,18 @@ class Stack:
     def peek(self):
         return self.items[-1]
 
+    def size(self):
+        return len(self.items)
 
 s = Stack()
 print(s.empty())
+print(s.size())
 s.push(0)
 s.push(1)
 s.push(2)
 print(s.peek())
+print(s.size())
 print(s.pop())
 print(s.peek())
+print(s.size())
 
