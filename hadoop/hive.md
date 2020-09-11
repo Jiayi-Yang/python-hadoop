@@ -28,10 +28,15 @@ create table if not exists jiayiyang_db.banklists(
     ST string,
     CERT int,
     `Acquiring Institution` string,
-    Closing Date
+    `Closing Date` string
 )
-row format delimited
-fields terminated by ','
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = ",",
+   "quoteChar"     = '"',
+   "escapeChar"    = "\\"
+)  
+STORED AS TEXTFILE
 tblproperties ("skip.header.line.count"="1");
 load data inpath '/user/jiayiyang/banklist' into table jiayiyang_db.banklists;
 ```
@@ -41,18 +46,18 @@ load data inpath '/user/jiayiyang/banklist' into table jiayiyang_db.banklists;
 col_name,data_type,comment
 # col_name            ,data_type           ,comment             
 ,NULL,NULL
-bank name,string,
-city,string,
-st,string,
-cert,int,
-acquiring institution,string,
-closing,date,
+bank name,string,from deserializer
+city,string,from deserializer
+st,string,from deserializer
+cert,string,from deserializer
+acquiring institution,string,from deserializer
+closing date,string,from deserializer
 ,NULL,NULL
 # Detailed Table Information,NULL,NULL
 Database:           ,jiayiyang_db        ,NULL
 OwnerType:          ,USER                ,NULL
 Owner:              ,jiayiyang           ,NULL
-CreateTime:         ,Fri Sep 11 01:54:12 UTC 2020,NULL
+CreateTime:         ,Fri Sep 11 21:39:24 UTC 2020,NULL
 LastAccessTime:     ,UNKNOWN             ,NULL
 Retention:          ,0                   ,NULL
 Location:           ,hdfs://nameservice1/user/hive/warehouse/jiayiyang_db.db/banklists,NULL
@@ -63,10 +68,10 @@ Table Parameters:,NULL,NULL
 ,rawDataSize         ,0                   
 ,skip.header.line.count,1                   
 ,totalSize           ,41343               
-,transient_lastDdlTime,1599789264          
+,transient_lastDdlTime,1599860375          
 ,NULL,NULL
 # Storage Information,NULL,NULL
-SerDe Library:      ,org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe,NULL
+SerDe Library:      ,org.apache.hadoop.hive.serde2.OpenCSVSerde,NULL
 InputFormat:        ,org.apache.hadoop.mapred.TextInputFormat,NULL
 OutputFormat:       ,org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat,NULL
 Compressed:         ,No                  ,NULL
@@ -74,12 +79,23 @@ Num Buckets:        ,-1                  ,NULL
 Bucket Columns:     ,[]                  ,NULL
 Sort Columns:       ,[]                  ,NULL
 Storage Desc Params:,NULL,NULL
-,field.delim         ,",                   "
-,serialization.format,",                   "
+,escapeChar          ,\\                  
+,quoteChar           ,"\""                  "
+,separatorChar       ,",                   "
+,serialization.format,1                   
+
 
 ```
 - select * from <yourtable> limit5;
-![managed_limit5](https://files.catbox.moe/5rd799.png)
+```
+banklists.bank name,banklists.city,banklists.st,banklists.cert,banklists.acquiring institution,banklists.closing date
+The First State Bank,Barboursville,WV,14361,"MVB Bank, Inc.",3-Apr-20
+Ericson State Bank,Ericson,NE,18265,Farmers and Merchants Bank,14-Feb-20
+City National Bank of New Jersey,Newark,NJ,21111,Industrial Bank,1-Nov-19
+Resolute Bank,Maumee,OH,58317,Buckeye State Bank,25-Oct-19
+Louisa Community Bank,Louisa,KY,58112,Kentucky Farmers Bank Corporation,25-Oct-19
+
+```
 - select count(*) from <yourtable>;
 
 `561`
@@ -98,31 +114,35 @@ create external table if not exists jiayiyang_db.banklists_ex(
     ST string,
     CERT int,
     `Acquiring Institution` string,
-    Closing Date
+    `Closing Date` string
 )
-row format delimited
-fields terminated by ','
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = ",",
+   "quoteChar"     = '"',
+   "escapeChar"    = "\\"
+)  
+STORED AS TEXTFILE
 location '/user/jiayiyang/banklist_dbex'
-tblproperties ("skip.header.line.count"="1")
-;
+tblproperties ("skip.header.line.count"="1");
 ```
 - desc formatted <yourtable>;
 ```
 col_name,data_type,comment
 # col_name            ,data_type           ,comment             
 ,NULL,NULL
-bank name,string,
-city,string,
-st,string,
-cert,int,
-acquiring institution,string,
-closing,date,
+bank name,string,from deserializer
+city,string,from deserializer
+st,string,from deserializer
+cert,string,from deserializer
+acquiring institution,string,from deserializer
+closing date,string,from deserializer
 ,NULL,NULL
 # Detailed Table Information,NULL,NULL
 Database:           ,jiayiyang_db        ,NULL
 OwnerType:          ,USER                ,NULL
 Owner:              ,jiayiyang           ,NULL
-CreateTime:         ,Fri Sep 11 20:42:48 UTC 2020,NULL
+CreateTime:         ,Fri Sep 11 21:52:43 UTC 2020,NULL
 LastAccessTime:     ,UNKNOWN             ,NULL
 Retention:          ,0                   ,NULL
 Location:           ,hdfs://nameservice1/user/jiayiyang/banklist_dbex,NULL
@@ -132,10 +152,10 @@ Table Parameters:,NULL,NULL
 ,numFiles            ,1                   
 ,skip.header.line.count,1                   
 ,totalSize           ,41343               
-,transient_lastDdlTime,1599856968          
+,transient_lastDdlTime,1599861163          
 ,NULL,NULL
 # Storage Information,NULL,NULL
-SerDe Library:      ,org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe,NULL
+SerDe Library:      ,org.apache.hadoop.hive.serde2.OpenCSVSerde,NULL
 InputFormat:        ,org.apache.hadoop.mapred.TextInputFormat,NULL
 OutputFormat:       ,org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat,NULL
 Compressed:         ,No                  ,NULL
@@ -143,12 +163,22 @@ Num Buckets:        ,-1                  ,NULL
 Bucket Columns:     ,[]                  ,NULL
 Sort Columns:       ,[]                  ,NULL
 Storage Desc Params:,NULL,NULL
-,field.delim         ,",                   "
-,serialization.format,",                   "
+,escapeChar          ,\\                  
+,quoteChar           ,"\""                  "
+,separatorChar       ,",                   "
+,serialization.format,1                   
 
 ```
 - select * from <yourtable> limit5;
-![external_limit5](https://files.catbox.moe/zz7gld.png)
+```
+banklists_ex.bank name,banklists_ex.city,banklists_ex.st,banklists_ex.cert,banklists_ex.acquiring institution,banklists_ex.closing date
+The First State Bank,Barboursville,WV,14361,"MVB Bank, Inc.",3-Apr-20
+Ericson State Bank,Ericson,NE,18265,Farmers and Merchants Bank,14-Feb-20
+City National Bank of New Jersey,Newark,NJ,21111,Industrial Bank,1-Nov-19
+Resolute Bank,Maumee,OH,58317,Buckeye State Bank,25-Oct-19
+Louisa Community Bank,Louisa,KY,58112,Kentucky Farmers Bank Corporation,25-Oct-19
+
+```
 - select count(*) from <yourtable>;
 
 `561`
