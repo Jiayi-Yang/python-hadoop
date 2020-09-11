@@ -38,47 +38,48 @@ load data inpath '/user/jiayiyang/banklist' into table jiayiyang_db.banklists;
 
 - desc formatted <yourtable>;
 ```
-col_name	data_type	comment	
-# col_name            	data_type           	comment             	
-	NULL	NULL	
-bank name	string		
-city	string		
-st	string		
-cert	int		
-acquiring institution	string		
-closing	date		
-	NULL	NULL	
-# Detailed Table Information	NULL	NULL	
-Database:           	jiayiyang_db        	NULL	
-OwnerType:          	USER                	NULL	
-Owner:              	jiayiyang           	NULL	
-CreateTime:         	Fri Sep 11 01:54:12 UTC 2020	NULL	
-LastAccessTime:     	UNKNOWN             	NULL	
-Retention:          	0                   	NULL	
-Location:           	hdfs://nameservice1/user/hive/warehouse/jiayiyang_db.db/banklists	NULL	
-Table Type:         	MANAGED_TABLE       	NULL	
-Table Parameters:	NULL	NULL	
-	numFiles            	1                   	
-	numRows             	0                   	
-	rawDataSize         	0                   	
-	skip.header.line.count	1                   	
-	totalSize           	41343               	
-	transient_lastDdlTime	1599789264          	
-	NULL	NULL	
-# Storage Information	NULL	NULL	
-SerDe Library:      	org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe	NULL	
-InputFormat:        	org.apache.hadoop.mapred.TextInputFormat	NULL	
-OutputFormat:       	org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat	NULL	
-Compressed:         	No                  	NULL	
-Num Buckets:        	-1                  	NULL	
-Bucket Columns:     	[]                  	NULL	
-Sort Columns:       	[]                  	NULL	
-Storage Desc Params:	NULL	NULL	
-	field.delim         	,                   	
-	serialization.format	,                   	
+col_name,data_type,comment
+# col_name            ,data_type           ,comment             
+,NULL,NULL
+bank name,string,
+city,string,
+st,string,
+cert,int,
+acquiring institution,string,
+closing,date,
+,NULL,NULL
+# Detailed Table Information,NULL,NULL
+Database:           ,jiayiyang_db        ,NULL
+OwnerType:          ,USER                ,NULL
+Owner:              ,jiayiyang           ,NULL
+CreateTime:         ,Fri Sep 11 01:54:12 UTC 2020,NULL
+LastAccessTime:     ,UNKNOWN             ,NULL
+Retention:          ,0                   ,NULL
+Location:           ,hdfs://nameservice1/user/hive/warehouse/jiayiyang_db.db/banklists,NULL
+Table Type:         ,MANAGED_TABLE       ,NULL
+Table Parameters:,NULL,NULL
+,numFiles            ,1                   
+,numRows             ,0                   
+,rawDataSize         ,0                   
+,skip.header.line.count,1                   
+,totalSize           ,41343               
+,transient_lastDdlTime,1599789264          
+,NULL,NULL
+# Storage Information,NULL,NULL
+SerDe Library:      ,org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe,NULL
+InputFormat:        ,org.apache.hadoop.mapred.TextInputFormat,NULL
+OutputFormat:       ,org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat,NULL
+Compressed:         ,No                  ,NULL
+Num Buckets:        ,-1                  ,NULL
+Bucket Columns:     ,[]                  ,NULL
+Sort Columns:       ,[]                  ,NULL
+Storage Desc Params:,NULL,NULL
+,field.delim         ,",                   "
+,serialization.format,",                   "
+
 ```
 - select * from <yourtable> limit5;
-
+![managed_limit5](https://files.catbox.moe/5rd799.png)
 - select count(*) from <yourtable>;
 
 `561`
@@ -86,12 +87,93 @@ Storage Desc Params:	NULL	NULL
 Hint:Use org.apache.hadoop.hive.serde2.OpenCSVSerde. Study the banklist.csv file (hint:some columns have quoted text).Do some research using google to see which SERDEPROPERTIES you need to specify.
 
 (4)In your database, create a Hive external table using the CSV files. After create the table,run some queries to verify the table is created correctly.
+```bash
+hdfs dfs -mkdir banklist_dbex
+hdfs dfs -cp /data/banklist/banklist.csv ./banklist_dbex/
+```
+```sql
+create external table if not exists jiayiyang_db.banklists_ex(
+    `Bank Name` string,
+    City string,
+    ST string,
+    CERT int,
+    `Acquiring Institution` string,
+    Closing Date
+)
+row format delimited
+fields terminated by ','
+location '/user/jiayiyang/banklist_dbex'
+tblproperties ("skip.header.line.count"="1")
+;
+```
 - desc formatted <yourtable>;
-- select * from <yourtable> limit5;
-- select count(*) from <yourtable>;
-- drop table <your table>; verify the data folder is not deleted by Hive.
+```
+col_name,data_type,comment
+# col_name            ,data_type           ,comment             
+,NULL,NULL
+bank name,string,
+city,string,
+st,string,
+cert,int,
+acquiring institution,string,
+closing,date,
+,NULL,NULL
+# Detailed Table Information,NULL,NULL
+Database:           ,jiayiyang_db        ,NULL
+OwnerType:          ,USER                ,NULL
+Owner:              ,jiayiyang           ,NULL
+CreateTime:         ,Fri Sep 11 20:42:48 UTC 2020,NULL
+LastAccessTime:     ,UNKNOWN             ,NULL
+Retention:          ,0                   ,NULL
+Location:           ,hdfs://nameservice1/user/jiayiyang/banklist_dbex,NULL
+Table Type:         ,EXTERNAL_TABLE      ,NULL
+Table Parameters:,NULL,NULL
+,EXTERNAL            ,TRUE                
+,numFiles            ,1                   
+,skip.header.line.count,1                   
+,totalSize           ,41343               
+,transient_lastDdlTime,1599856968          
+,NULL,NULL
+# Storage Information,NULL,NULL
+SerDe Library:      ,org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe,NULL
+InputFormat:        ,org.apache.hadoop.mapred.TextInputFormat,NULL
+OutputFormat:       ,org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat,NULL
+Compressed:         ,No                  ,NULL
+Num Buckets:        ,-1                  ,NULL
+Bucket Columns:     ,[]                  ,NULL
+Sort Columns:       ,[]                  ,NULL
+Storage Desc Params:,NULL,NULL
+,field.delim         ,",                   "
+,serialization.format,",                   "
 
+```
+- select * from <yourtable> limit5;
+![external_limit5](https://files.catbox.moe/zz7gld.png)
+- select count(*) from <yourtable>;
+
+`561`
+- drop table <your table>; verify the data folder is not deleted by Hive.
+the data folder still there
+![external-delete](https://files.catbox.moe/h9cga8.png)
 
 
 (5)Create a Hive table using AVRO file where you get from the SQOOP homework.
-    
+```bash
+hdfs dfs -mkdir order_items_db
+hdfs dfs -put order_items_files/order_items.avro order_items_db/
+avro-tools getschema order_items_files/order_items.avro
+```  
+```sql
+create external table if not exists jiayiyang_db.order_items(
+    order_item_id int,
+    order_item_order_id int,
+    order_item_product_id int,
+    order_item_quantity int,
+    order_item_subtotal float,
+    order_item_product_price float
+)
+stored as avro
+location '/user/jiayiyang/order_items_db';
+select * from jiayiyang_db.order_items limit 5;
+```
+![external-avro](https://files.catbox.moe/w73pdt.png)
