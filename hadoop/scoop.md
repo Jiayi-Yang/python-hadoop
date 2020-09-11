@@ -234,8 +234,6 @@ avro.codec	snappy
 ```
 - rowcount
 ```
-[jiayiyang@ip-172-31-92-98 ~]$ wc  order_items_files/order_items.avro
-   8076  128702 1496890 order_items_files/order_items.avro
 [jiayiyang@ip-172-31-92-98 ~]$ wc  order_items_files/order_items.json
   172198   172198 37609906 order_items_files/order_items.json
 ```
