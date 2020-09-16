@@ -150,9 +150,9 @@ select id,  case_number,  `date`,  block, iucr,  primary_type,  description,
     loc, 2020 from crime_parquet where yr = 2020;
 ```
 
-`SELECT count(*) FROM jiayiyang_db.crime_parquet_16_20;`1205007
+`SELECT count(*) FROM jiayiyang_db.crime_parquet_16_20;`1205007 #TODO
 
-`SELECT count(*) FROM crime_parquet;`7187321
+`SELECT count(*) FROM crime_parquet;`7187321 #TODO
 - (3)Write queries to answer following questions:
 - Which type of crime is most occurring for each year?  List top 10 crimes for each year.
  ```sql
@@ -241,7 +241,7 @@ ALLEY	23774
 VEHICLE NON-COMMERCIAL	21501	
 
 ```
- - Are there certain high crime rate locations for certain crime types?
+ - Are there certain high crime rate locations for certain crime types? #TODO
 ```
 SELECT loc_desc, primary_type,count(*) as num_crime_loc_type
 FROM crime_parquet_16_20
@@ -265,11 +265,11 @@ RESIDENCE,CRIMINAL DAMAGE,24211
 ```
 ## 3.Retail_db dataset:
 In retail_db, there are 6 tables.  Get yourself familiar with their schemas.
-categoriescustomersdepartmentsordersorder_itemsproducts
+categories,customers,departments,orders,order_items,products
 
 Write queries to answer following questions:
 - (1)List all orders with total order_items = 5.
-```
+```sql
 SELECT order_id, sum(order_item_quantity)
 FROM order_items
 JOIN orders
