@@ -313,36 +313,27 @@ JOIN customers ON customers.customer_id = orders.order_customer_id;
 14665 records
 - (4)List top 10 most popular product categories. (join products, categories,order_items table)
 ```sql
-SELECT category_name, sum(order_quantity) as sell_quantity
-FROM orders
-JOIN order_items ON orders.order_id = order_items.order_item_order_id
-JOIN products ON order_items.order_item_product_id = products.product_id
-JOIN categories ON products.product_category_id = categories.category_id
-JOIN 
-    (
-        SELECT order_id, sum(order_item_quantity) as order_quantity
-        FROM order_items
-        JOIN orders
-        ON order_items.order_item_order_id = orders.order_id
-        GROUP BY order_id
-    ) a
-ON a.order_id = orders.order_id
-GROUP BY category_name
-ORDER BY sell_quantity DESC
-LIMIT 10;
+select category_name, sum(order_item_quantity) as num_sell
+from order_items
+join products on order_items.order_item_product_id = products.product_id
+join categories on product_category_id = category_id
+group by category_name
+order by num_sell desc
+limit 10;
 ```
 ```
-category_name	sell_quantity	
-Cleats	                216202	
-Women's Apparel	        185351	
-Indoor/Outdoor Games	171099	
-Men's Footwear	        151921	
-Fishing	                118052	
-Cardio Equipment	110398	
-Water Sports	        105236	
-Shop By Sport	        95982	
-Camping & Hiking	93412	
-Electronics	        28101	
+category_name	num_sell	
+Cleats	73734	
+Women's Apparel	62956	
+Indoor/Outdoor Games	57803	
+Cardio Equipment	37587	
+Shop By Sport	32726	
+Men's Footwear	22246	
+Fishing	17325	
+Water Sports	15540	
+Camping & Hiking	13729	
+Electronics	9436	
+
 
 ```
 - (5)List top 10 revenue generating products. (join products, orders, order_items table)
