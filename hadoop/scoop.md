@@ -27,7 +27,7 @@ sqoop import-all-tables \
 --connect jdbc:mysql://database.ascendingdc.com:3306/retail_db \
 --username=student \
 --password=1234abcd \
---fields-terminated-by '|' \
+--fields-terminated-by '#' \
 --warehouse-dir /user/jiayiyang/retail_db/text
 ```
 (5)Import table order_items to hdfs, in avro format, save in hdfs folder /user/<your_id>/retail_db/avro
