@@ -1,8 +1,8 @@
 # Python & Hadoop
-### hadoop
+## hadoop
 hadoop learning & exercise: scoop,hdfs,hive
 
-### data_structure
+## data structure
 data structure and implement in python: 
 - stack
 - queue
@@ -10,8 +10,11 @@ data structure and implement in python:
 - linked list
 - recursive
 
-### algorithm
+## algorithm
+### search
 - dfs
 - bfs
 - binary search
+### sort
+- bubble sort
 
