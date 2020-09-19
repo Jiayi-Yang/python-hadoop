@@ -112,47 +112,26 @@ yr	int
 
 ```
 - (2)Import 2016 to 2020 data into the partitioned table from table chicago.crime.
+- Dynamic Partition
 ```sql
-SHOW COLUMNS IN crime_parquet;
+truncate table crime_parquet_16_20_test;
 set hive.exec.dynamic.partition=true;
 set hive.exec.dynamic.partition.mode=nonstrict;
 insert into table jiayiyang_db.crime_parquet_16_20 partition (yr) 
-select * from crime_parquet;
+select id, case_number, `date`, block, iucr, primary_type, description, loc_desc, arrest, domestic, beat, district, ward, community_area, fbi_code, x_coordinate, y_coordinate, updated_on, latitude, longitude, loc, yr from chicago.crime_parquet WHERE yr>=2016 AND yr<=2020;
+SELECT count(*) FROM crime_parquet_16_20 GROUP BY yr;
 ```
-I tried the dynamic partition first, but it cost runtime error. #TODO
-I find `Error: java.lang.RuntimeException: org.apache.hadoop.hive.ql.metadata.HiveException: Hive Runtime Error while processing row` in YARN
-so I change to the partition only use one year data for each run.
+- Manuel Partition
+5 times from 2016 to 2020
 ```sql
 insert into table jiayiyang_db.crime_parquet_16_20 partition (yr)
 select id,  case_number,  `date`,  block, iucr,  primary_type,  description, 
     loc_desc,  arrest,  domestic,  beat,  district,  ward,  community_area, 
     fbi_code,  x_coordinate,  y_coordinate,  updated_on,  latitude,  longitude,
     loc, 2016 from crime_parquet where yr = 2016;
-insert into table jiayiyang_db.crime_parquet_16_20 partition (yr)
-select id,  case_number,  `date`,  block, iucr,  primary_type,  description, 
-    loc_desc,  arrest,  domestic,  beat,  district,  ward,  community_area, 
-    fbi_code,  x_coordinate,  y_coordinate,  updated_on,  latitude,  longitude,
-    loc, 2017 from crime_parquet where yr = 2017;
-insert into table jiayiyang_db.crime_parquet_16_20 partition (yr)
-select id,  case_number,  `date`,  block, iucr,  primary_type,  description, 
-    loc_desc,  arrest,  domestic,  beat,  district,  ward,  community_area, 
-    fbi_code,  x_coordinate,  y_coordinate,  updated_on,  latitude,  longitude,
-    loc, 2018 from crime_parquet where yr = 2018;
-insert into table jiayiyang_db.crime_parquet_16_20 partition (yr)
-select id,  case_number,  `date`,  block, iucr,  primary_type,  description, 
-    loc_desc,  arrest,  domestic,  beat,  district,  ward,  community_area, 
-    fbi_code,  x_coordinate,  y_coordinate,  updated_on,  latitude,  longitude,
-    loc, 2019 from crime_parquet where yr = 2019;
-insert into table jiayiyang_db.crime_parquet_16_20 partition (yr)
-select id,  case_number,  `date`,  block, iucr,  primary_type,  description, 
-    loc_desc,  arrest,  domestic,  beat,  district,  ward,  community_area, 
-    fbi_code,  x_coordinate,  y_coordinate,  updated_on,  latitude,  longitude,
-    loc, 2020 from crime_parquet where yr = 2020;
 ```
 
-`SELECT count(*) FROM jiayiyang_db.crime_parquet_16_20;`1205007 #TODO
 
-`SELECT count(*) FROM crime_parquet;`7187321 #TODO
 - (3)Write queries to answer following questions:
 - Which type of crime is most occurring for each year?  List top 10 crimes for each year.
  ```sql
@@ -240,7 +219,7 @@ ALLEY	23774
 VEHICLE NON-COMMERCIAL	21501	
 
 ```
- - Are there certain high crime rate locations for certain crime types? #TODO
+ - Are there certain high crime rate locations for certain crime types? 
 ```sql
 SELECT loc_desc, primary_type,count(*) as num_crime_loc_type
 FROM crime_parquet_16_20
