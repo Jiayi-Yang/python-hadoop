@@ -1,6 +1,9 @@
 # Python & Hadoop
 ## hadoop
-hadoop learning & exercise: scoop,hdfs,hive
+hadoop learning & exercise: 
+- scoop & hdfs
+- hive
+- impala
 
 ## data structure
 data structure and implement in python: 
