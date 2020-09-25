@@ -114,7 +114,7 @@ yr	int
 - (2)Import 2016 to 2020 data into the partitioned table from table chicago.crime.
 - Dynamic Partition
 ```sql
-truncate table crime_parquet_16_20_test;
+truncate table crime_parquet_16_20;
 set hive.exec.dynamic.partition=true;
 set hive.exec.dynamic.partition.mode=nonstrict;
 insert into table jiayiyang_db.crime_parquet_16_20 partition (yr) 
