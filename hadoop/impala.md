@@ -158,9 +158,17 @@ ON order_items.order_item_order_id = orders.order_id
 GROUP BY order_id
 HAVING sum(order_item_quantity) = 5;
 ```
-### TODO Hive 5806 records, Impala 1024 records
+Impala only show 1024+ records, impala shell will show 5806 records
 - (2)List customer_fname，customer_id, order_id, order item_count with total order_items = 5
 ```sql
+compute stats retail_db.categories;
+compute stats retail_db.customers;
+compute stats retail_db.customers_parquet;
+compute stats retail_db.departments;
+compute stats retail_db.order_items;
+compute stats retail_db.orders;
+compute stats retail_db.products;
+
 SELECT customer_fname, customer_id, orders.order_id, order_item_quantity
 FROM orders
 JOIN order_items ON orders.order_id = order_items.order_item_order_id
@@ -175,7 +183,7 @@ WHERE orders.order_id IN
         HAVING sum(order_item_quantity) = 5
     );
 ```
-### TODO out of memory
+
 - (3)List customer_fname，customer_id, order_id, order item_count with total order_items = 5(join orders, order_items, customers table)
 ```sql
 SELECT customer_fname, customer_id, a.order_id, order_item_quantity
@@ -192,7 +200,7 @@ JOIN orders ON a.order_id = orders.order_id
 JOIN order_items ON a.order_id = order_items.order_item_order_id
 JOIN customers ON customers.customer_id = orders.order_customer_id;
 ```
-### TODO Hive 14665 records, Impala 1024 records
+Impala only show 1024+ records, impala shell will show 5806 records
 - (4)List top 10 most popular product categories. (join products, categories,order_items table)
 ```sql
 select category_name, sum(order_item_quantity) as num_sell
@@ -203,4 +211,3 @@ group by category_name
 order by num_sell desc
 limit 10;
 ```
-### TODO out of memory
