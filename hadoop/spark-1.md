@@ -94,9 +94,77 @@ scala> spark.sql("select e.name,e.sal from emp e join emp m on e.mgr=m.empno whe
 |FORD|3000|
 +----+----+
 ```
-# Spark DF
+### 6.list employee's name and salary whose salary is higher than average salary of whole company
+```
+scala> spark.sql("select name,sal from emp where sal > (select avg(sal) from emp)").show()
++-----+----+
+| name| sal|
++-----+----+
+|JONES|2975|
+|BLAKE|2850|
+|CLARK|2450|
+| KING|5000|
+| FORD|3000|
++-----+----+
+```
+### 7.list employee's name and dept name whose name start with "J"
+```
+scala> spark.sql("select name,dept_name from dept join emp on dept.dept_no = emp.deptno where name like 'J%'").show()
++-----+---------+
+| name|dept_name|
++-----+---------+
+|JONES| RESEARCH|
+|JAMES|    SALES|
++-----+---------+
+```
+### 8.list 3 employee's name and salary with highest salary
+```
+scala> spark.sql("select name,sal from emp order by sal desc limit 3").show()
++-----+----+
+| name| sal|
++-----+----+
+| KING|5000|
+| FORD|3000|
+|JONES|2975|
++-----+----+
+```
+### 9.sort employee by total income (salary+commission), list name and total income.
+```
+scala> spark.sql("select name,sal+comm as total_income from emp order by total_income desc").show()
++------+------------+
+|  name|total_income|
++------+------------+
+|  KING|        5000|
+|  FORD|        3000|
+| JONES|        2975|
+| BLAKE|        2850|
+|MARTIN|        2650|
+| CLARK|        2450|
+| ALLEN|        1900|
+|  WARD|        1750|
+|TURNER|        1500|
+|MILLER|        1300|
+| JAMES|         950|
+| SMITH|         800|
++------+------------+
+```
+# Spark DF (pyspark)
+```pyspark
+spark.conf.set("spark.sql.shuffle.partitions",2)
+path1 = "/data/spark/employee/dept-with-header.txt"
+dept = spark.read.format("csv").option("header",True).option("inferSchema",True).load(path1)
+path2 = "/data/spark/employee/emp-with-header.txt"
+emp = spark.read.format("csv").option("header",True).option("inferSchema",True).load(path2)
+```
 ### 1.list total salary for each dept.
+```python
+df = emp.join(dept,emp['deptno']==dept['dept_no'])
+df.groupby('dept_name').sum('sal').show()
+```
 ### 2.list total number of employee and average salary for each dept.
+```python
+df.groupby(df['dept_name']).agg(sum(df['sal']).alias('total_salary'),count(df['name']).alias('total_employee')).show()
+```
 ### 3.list the first hired employee's name for each dept.
 ### 4.list total employee salary for each city.
 ### 5.list employee's name and salary whose salary is higher than their manager
