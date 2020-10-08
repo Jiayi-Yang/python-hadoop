@@ -160,11 +160,117 @@ emp = spark.read.format("csv").option("header",True).option("inferSchema",True).
 ```python
 df = emp.join(dept,emp['deptno']==dept['dept_no'])
 df.groupby('dept_name').sum('sal').show()
++----------+--------+
+| dept_name|sum(sal)|
++----------+--------+
+|  RESEARCH|    6775|
+|ACCOUNTING|    8750|
+|     SALES|    9400|
++----------+--------+
 ```
 ### 2.list total number of employee and average salary for each dept.
 ```python
-df.groupby(df['dept_name']).agg(sum(df['sal']).alias('total_salary'),count(df['name']).alias('total_employee')).show()
+from pyspark.sql.functions import count,avg,round
+df = df.withColumn("sal", df['sal'].cast("int"))
+df.groupby('dept_name').agg(round(avg('sal')).alias('avg_salary'),count('*').alias('total_employee')).show()
++----------+----------+--------------+
+| dept_name|avg_salary|total_employee|
++----------+----------+--------------+
+|  RESEARCH|    2258.0|             3|
+|ACCOUNTING|    2917.0|             3|
+|     SALES|    1567.0|             6|
++----------+----------+--------------+
 ```
+
 ### 3.list the first hired employee's name for each dept.
+```python
+from pyspark.sql.functions import min
+cond = [df['dept_no']==min_hire_by_dept['deptno'], df['hiredate']==min_hire_by_dept['min_hire']]
+df.join(min_hire_by_dept, cond, 'inner').select('name', 'dept_name', 'min_hire').show()
++-----+----------+-------------------+
+| name| dept_name|           min_hire|
++-----+----------+-------------------+
+|SMITH|  RESEARCH|1980-12-17 00:00:00|
+|ALLEN|     SALES|1981-02-20 00:00:00|
+|CLARK|ACCOUNTING|1981-06-09 00:00:00|
++-----+----------+-------------------+
+```
 ### 4.list total employee salary for each city.
+```python
+df.groupby('loc').sum('sal').withColumnRenamed("loc","city").withColumnRenamed("sum(sal)","total_salary").show()
++-------+------------+
+|   city|total_salary|
++-------+------------+
+| DALLAS|        6775|
+|CHICAGO|        9400|
+|NEW YOR|        8750|
++-------+------------+
+```
 ### 5.list employee's name and salary whose salary is higher than their manager
+```python
+m = emp
+m = m.select('empno','sal').withColumnRenamed('empno','manager_id').withColumnRenamed('sal','manager_salary')
+emp.join(m,emp['mgr']==m['manager_id']).filter(emp['sal']>m['manager_salary']).select(emp['name'], emp['sal']).show()
++----+----+
+|name| sal|
++----+----+
+|FORD|3000|
++----+----+
+```
+### 6.list employee's name and salary whose salary is higher than average salary of whole company
+```python
+avg_sal = emp.agg(avg('sal').alias('avg_salary')).collect()[0][0]
+emp.filter(emp['sal']>avg_sal).select('name','sal').show()
++-----+----+
+| name| sal|
++-----+----+
+|JONES|2975|
+|BLAKE|2850|
+|CLARK|2450|
+| KING|5000|
+| FORD|3000|
++-----+----+
+```
+### 7.list employee's name and dept name whose name start with "J"
+```python
+df.filter(df['name'].startswith('J')).select('name','dept_name').show()
++-----+---------+
+| name|dept_name|
++-----+---------+
+|JONES| RESEARCH|
+|JAMES|    SALES|
++-----+---------+
+```
+### 8.list 3 employee's name and salary with highest salary
+```python
+from pyspark.sql.functions import desc
+df.sort(desc('sal')).select('name','sal').show(3)
++-----+----+
+| name| sal|
++-----+----+
+| KING|5000|
+| FORD|3000|
+|JONES|2975|
++-----+----+
+```
+### 9.sort employee by total income (salary+commission), list name and total income.
+```python
+df = df.withColumn('total_income',df['sal']+df['comm'])
+df.sort(desc('total_income')).select('name','total_income').show()
++------+------------+
+|  name|total_income|
++------+------------+
+|  KING|        5000|
+|  FORD|        3000|
+| JONES|        2975|
+| BLAKE|        2850|
+|MARTIN|        2650|
+| CLARK|        2450|
+| ALLEN|        1900|
+|  WARD|        1750|
+|TURNER|        1500|
+|MILLER|        1300|
+| JAMES|         950|
+| SMITH|         800|
++------+------------+
+```
