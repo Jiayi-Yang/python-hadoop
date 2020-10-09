@@ -218,7 +218,7 @@ order_temp.filter(order_temp["item_counts"]==5).sort("order_item_order_id").sele
 only showing top 20 rows
 ```
 - (4)List top 10 most popular product categories. (join products, categories,order_items table)
-```
+```python
 products = spark.read.table("retail_db.products")
 categories = spark.read.table("retail_db.categories")
 order_items.join(products,order_items['order_item_product_id']==products['product_id']).join(categories,categories['category_id']==products['product_category_id']).groupby("category_name").agg(count("*").alias("item_counts")).sort(desc("item_counts")).select("category_name","item_counts").show(10)
@@ -240,5 +240,22 @@ only showing top 10 rows
 ```
 - (5)List top 10 revenue generating products. (join products, orders, order_items table)
 ```python
-
+order_join = order_items.join(orders,order_items['order_item_order_id']==orders['order_id']).join(products,order_items['order_item_product_id']==products['product_id'])
+order_temp = order_join.groupby("product_name","product_id").agg(sum("order_item_subtotal").alias("revenue"))
+order_temp.sort(desc("revenue")).select("product_id","product_name","revenue").show(10)
++----------+--------------------+------------------+
+|product_id|        product_name|           revenue|
++----------+--------------------+------------------+
+|      1004|Field & Stream Sp...| 6929653.690338135|
+|       365|Perfect Fitness P...|  4421143.14352417|
+|       957|Diamondback Women...| 4118425.570831299|
+|       191|Nike Men's Free 5...| 3667633.196662903|
+|       502|Nike Men's Dri-FI...|         3147800.0|
+|      1073|Pelican Sunstream...| 3099845.085144043|
+|       403|Nike Men's CJ Eli...|2891757.6622009277|
+|      1014|O'Brien Men's Neo...|  2888993.91355896|
+|       627|Under Armour Girl...|1269082.6712722778|
+|       565|adidas Youth Germ...|           67830.0|
++----------+--------------------+------------------+
+only showing top 10 rows
 ```
