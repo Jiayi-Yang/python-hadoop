@@ -42,9 +42,6 @@ bank.withColumn('close_year',year(bank['closing_date'])).groupby('close_year').a
 +----------+---------+
 ```
 ## 2.Chicago crime dataset:
-- (1)In your own database, create a partitioned table(partitioned by year)to store data, store in parquet format.Name the table “crime_parquet_16_20”;
-- (2)Import 2016 to 2020 data into the partitioned table from table chicago.parquet.
-- TODO
 - (3)Write queries to answer following questions:
 - Which type of crime is most occurring for each year?  List top 10 crimes for each year.
 ```python
