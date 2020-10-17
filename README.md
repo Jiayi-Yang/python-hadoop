@@ -4,6 +4,7 @@ hadoop learning & exercise:
 - scoop & hdfs
 - hive
 - impala
+- spark sql & spark structure API
 
 ## data structure
 data structure and implement in python: 
