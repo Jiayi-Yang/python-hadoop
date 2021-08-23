@@ -4,7 +4,7 @@ def bubble_sort(arr):
         for n in range(k):
             print(f"The num of N:{n}")
             if arr[n] > arr[n+1]:
-                arr[n+1], arr[n] = arr[n], arr[n+1]
+                arr[n], arr[n+1],  = arr[n+1],arr[n]
     return arr
 
 
